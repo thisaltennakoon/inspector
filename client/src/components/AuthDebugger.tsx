@@ -120,7 +120,6 @@ const AuthDebugger = ({
     updateAuthState({ isInitiatingAuth: true, statusMessage: null });
     try {
       // Step through the OAuth flow using the state machine instead of the auth() function
-      // Start with a fresh state and provider
       let currentState: AuthDebuggerState = {
         ...authState,
         oauthStep: "metadata_discovery",
@@ -137,8 +136,6 @@ const AuthDebugger = ({
       // Manually step through each stage of the OAuth flow
       while (currentState.oauthStep !== "complete") {
         await oauthMachine.executeStep(currentState);
-
-        // If we reach the authorization code step, we need to wait for user input
         // In quick mode, we'll just redirect to the authorization URL
         if (
           currentState.oauthStep === "authorization_code" &&
@@ -146,7 +143,7 @@ const AuthDebugger = ({
         ) {
           // Open the authorization URL automatically
           window.location.href = currentState.authorizationUrl;
-          break; // Exit the flow - we'll need user input
+          break;
         }
       }
 
