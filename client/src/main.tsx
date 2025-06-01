@@ -8,7 +8,10 @@ import { TooltipProvider } from "./components/ui/tooltip.tsx";
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <TooltipProvider>
-      <App />
+      <App
+          mcpServerUrl="http://localhost:3001/mcp"
+          authentication={{ headerName: '', bearerToken: '' }}
+      />
     </TooltipProvider>
     <Toaster />
   </StrictMode>,

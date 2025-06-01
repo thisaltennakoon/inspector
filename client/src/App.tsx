@@ -35,12 +35,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import {
   Bell,
-  Files,
-  FolderTree,
   Hammer,
-  Hash,
-  Key,
-  MessageSquare,
 } from "lucide-react";
 
 import { z } from "zod";
@@ -57,8 +52,6 @@ import Sidebar from "./components/Sidebar";
 import ToolsTab from "./components/ToolsTab";
 import { InspectorConfig } from "./lib/configurationTypes";
 import {
-  getMCPProxyAddress,
-  getInitialSseUrl,
   getInitialTransportType,
   getInitialCommand,
   getInitialArgs,
@@ -67,7 +60,15 @@ import {
 
 const CONFIG_LOCAL_STORAGE_KEY = "inspectorConfig_v1";
 
-const App = () => {
+interface AppProps {
+  mcpServerUrl: string;
+  authentication: {
+    headerName: string;
+    bearerToken: string;
+  };
+}
+
+const App = ({ mcpServerUrl, authentication }: AppProps) => {
   const [resources, setResources] = useState<Resource[]>([]);
   const [resourceTemplates, setResourceTemplates] = useState<
     ResourceTemplate[]
@@ -86,7 +87,7 @@ const App = () => {
   const [command, setCommand] = useState<string>(getInitialCommand);
   const [args, setArgs] = useState<string>(getInitialArgs);
 
-  const [sseUrl, setSseUrl] = useState<string>(getInitialSseUrl);
+  const [sseUrl, setSseUrl] = useState<string>(() => mcpServerUrl);
   const [transportType, setTransportType] = useState<
     "stdio" | "sse" | "streamable-http"
   >(getInitialTransportType);
@@ -101,13 +102,9 @@ const App = () => {
   const [config, setConfig] = useState<InspectorConfig>(() =>
     initializeInspectorConfig(CONFIG_LOCAL_STORAGE_KEY),
   );
-  const [bearerToken, setBearerToken] = useState<string>(() => {
-    return localStorage.getItem("lastBearerToken") || "";
-  });
+  const [bearerToken, setBearerToken] = useState<string>(() => authentication.bearerToken);
 
-  const [headerName, setHeaderName] = useState<string>(() => {
-    return localStorage.getItem("lastHeaderName") || "";
-  });
+  const [headerName, setHeaderName] = useState<string>(() => authentication.headerName);
 
   const [pendingSampleRequests, setPendingSampleRequests] = useState<
     Array<
@@ -218,13 +215,13 @@ const App = () => {
     localStorage.setItem("lastTransportType", transportType);
   }, [transportType]);
 
-  useEffect(() => {
-    localStorage.setItem("lastBearerToken", bearerToken);
-  }, [bearerToken]);
-
-  useEffect(() => {
-    localStorage.setItem("lastHeaderName", headerName);
-  }, [headerName]);
+  // useEffect(() => {
+  //   localStorage.setItem("lastBearerToken", bearerToken);
+  // }, [bearerToken]);
+  //
+  // useEffect(() => {
+  //   localStorage.setItem("lastHeaderName", headerName);
+  // }, [headerName]);
 
   useEffect(() => {
     localStorage.setItem(CONFIG_LOCAL_STORAGE_KEY, JSON.stringify(config));
@@ -291,24 +288,6 @@ const App = () => {
 
     loadOAuthTokens();
   }, [sseUrl]);
-
-  useEffect(() => {
-    fetch(`${getMCPProxyAddress(config)}/config`)
-      .then((response) => response.json())
-      .then((data) => {
-        setEnv(data.defaultEnvironment);
-        if (data.defaultCommand) {
-          setCommand(data.defaultCommand);
-        }
-        if (data.defaultArgs) {
-          setArgs(data.defaultArgs);
-        }
-      })
-      .catch((error) =>
-        console.error("Error fetching default environment:", error),
-      );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     rootsRef.current = roots;
@@ -610,20 +589,6 @@ const App = () => {
             >
               <TabsList className="mb-4 p-0">
                 <TabsTrigger
-                  value="resources"
-                  disabled={!serverCapabilities?.resources}
-                >
-                  <Files className="w-4 h-4 mr-2" />
-                  Resources
-                </TabsTrigger>
-                <TabsTrigger
-                  value="prompts"
-                  disabled={!serverCapabilities?.prompts}
-                >
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Prompts
-                </TabsTrigger>
-                <TabsTrigger
                   value="tools"
                   disabled={!serverCapabilities?.tools}
                 >
@@ -633,23 +598,6 @@ const App = () => {
                 <TabsTrigger value="ping">
                   <Bell className="w-4 h-4 mr-2" />
                   Ping
-                </TabsTrigger>
-                <TabsTrigger value="sampling" className="relative">
-                  <Hash className="w-4 h-4 mr-2" />
-                  Sampling
-                  {pendingSampleRequests.length > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
-                      {pendingSampleRequests.length}
-                    </span>
-                  )}
-                </TabsTrigger>
-                <TabsTrigger value="roots">
-                  <FolderTree className="w-4 h-4 mr-2" />
-                  Roots
-                </TabsTrigger>
-                <TabsTrigger value="auth">
-                  <Key className="w-4 h-4 mr-2" />
-                  Auth
                 </TabsTrigger>
               </TabsList>
 

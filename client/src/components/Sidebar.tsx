@@ -234,7 +234,7 @@ const Sidebar = ({
             </label>
             <Select
               value={transportType}
-              onValueChange={(value: "stdio" | "sse" | "streamable-http") =>
+              onValueChange={(value: "streamable-http") =>
                 setTransportType(value)
               }
             >
@@ -242,8 +242,6 @@ const Sidebar = ({
                 <SelectValue placeholder="Select transport type" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="stdio">STDIO</SelectItem>
-                <SelectItem value="sse">SSE</SelectItem>
                 <SelectItem value="streamable-http">Streamable HTTP</SelectItem>
               </SelectContent>
             </Select>
@@ -719,59 +717,6 @@ const Sidebar = ({
                 </div>
               </>
             )}
-          </div>
-        </div>
-      </div>
-      <div className="p-4 border-t">
-        <div className="flex items-center justify-between">
-          <Select
-            value={theme}
-            onValueChange={(value: string) =>
-              setTheme(value as "system" | "light" | "dark")
-            }
-          >
-            <SelectTrigger className="w-[100px]" id="theme-select">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="system">System</SelectItem>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" title="Inspector Documentation" asChild>
-              <a
-                href="https://modelcontextprotocol.io/docs/tools/inspector"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <CircleHelp className="w-4 h-4 text-foreground" />
-              </a>
-            </Button>
-            <Button variant="ghost" title="Debugging Guide" asChild>
-              <a
-                href="https://modelcontextprotocol.io/docs/tools/debugging"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Bug className="w-4 h-4 text-foreground" />
-              </a>
-            </Button>
-            <Button
-              variant="ghost"
-              title="Report bugs or contribute on GitHub"
-              asChild
-            >
-              <a
-                href="https://github.com/modelcontextprotocol/inspector"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github className="w-4 h-4 text-foreground" />
-              </a>
-            </Button>
           </div>
         </div>
       </div>
